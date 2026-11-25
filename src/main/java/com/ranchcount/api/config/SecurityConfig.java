@@ -49,6 +49,9 @@ public class SecurityConfig {
                         // Endpoints publicos (Login y documentacion interactiva OpenAPI 3.0)
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/apk/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
