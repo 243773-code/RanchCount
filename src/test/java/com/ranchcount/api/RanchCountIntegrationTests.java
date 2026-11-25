@@ -18,11 +18,14 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -593,5 +596,23 @@ class RanchCountIntegrationTests {
                                 }
                                 """))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("6. Landing publica, logo y descarga directa del APK responden sin autenticacion JWT")
+    void landingPublicaYDescargaApkSinAutenticacion() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(content().string(containsString("Zootecnia")))
+                .andExpect(content().string(containsString("/apk/ranchcount.apk")));
+
+        mockMvc.perform(get("/apk/ranchcount.apk"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/vnd.android.package-archive"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("Zootecnia-RanchCount.apk")));
+
+        mockMvc.perform(get("/images/logo.png"))
+                .andExpect(status().isOk());
     }
 }

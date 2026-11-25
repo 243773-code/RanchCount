@@ -3,201 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Descargar RanchCount Android</title>
+    <title>Zootecnia · RanchCount — Gestión Ganadera y Agrícola</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2D6A4F;
             --primary-dark: #1B4332;
-            --accent: #D00000;
-            --bg: #F4F6F4;
-            --card-bg: #FFFFFF;
-            --text-main: #1F2937;
-            --text-sub: #6B7280;
+            --secondary: #1D4E89;
+            --bg: #F3F6F4;
+            --card: #FFFFFF;
+            --text: #1F2937;
+            --muted: #6B7280;
+            --border: #E5E7EB;
         }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         body {
             background-color: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px 16px;
+            color: var(--text);
+            line-height: 1.6;
         }
-        .container {
-            background: var(--card-bg);
-            max-width: 460px;
-            width: 100%;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08), 0 0 1px 1px rgba(0,0,0,0.04);
-            overflow: hidden;
+        .hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 58%, var(--secondary) 100%);
+            color: #FFFFFF;
+            padding: 56px 20px 64px;
             text-align: center;
         }
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 40px 24px 32px;
-            color: #FFFFFF;
+        .hero-inner {
+            max-width: 780px;
+            margin: 0 auto;
         }
-        .app-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.18);
-            backdrop-filter: blur(8px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-        .app-title {
-            font-size: 30px;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 8px;
-        }
-        .app-tagline {
-            font-size: 15px;
-            opacity: 0.9;
-        }
-        .body-content {
-            padding: 32px 24px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-        .info-box {
-            background: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            padding: 12px 8px;
-            border-radius: 14px;
-        }
-        .info-box span {
-            display: block;
-            font-size: 11px;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .info-box strong {
-            font-size: 14px;
-            color: var(--text-main);
-        }
-        .btn-download {
+        .logo-wrap {
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 20px;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 10px;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        .logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 16px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            letter-spacing: 0.3px;
+        }
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+        .hero p {
+            font-size: clamp(15px, 2.3vw, 18px);
+            opacity: 0.92;
+            max-width: 620px;
+            margin: 0 auto 28px;
+        }
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             gap: 12px;
-            background: var(--primary);
-            color: #FFFFFF;
+            background: #FFFFFF;
+            color: var(--primary-dark);
             text-decoration: none;
-            padding: 18px 24px;
+            padding: 16px 30px;
             border-radius: 16px;
             font-size: 16px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 20px -5px rgba(45, 106, 79, 0.4);
+            font-weight: 800;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
         .btn-download:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 14px 24px -5px rgba(45, 106, 79, 0.5);
-        }
-        .btn-download:active {
-            transform: translateY(0);
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
         }
         .btn-download svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             fill: currentColor;
         }
-        .instructions {
-            margin-top: 28px;
-            text-align: left;
-            background: #F8FAF8;
-            border: 1px solid #E2E8F0;
+        .meta-pills {
+            margin-top: 18px;
+            font-size: 13px;
+            opacity: 0.88;
+        }
+        .main {
+            max-width: 1020px;
+            margin: -28px auto 48px;
+            padding: 0 16px;
+        }
+        .section-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 32px 24px;
+            box-shadow: 0 14px 32px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .feature-item {
+            background: #F9FBFA;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .feature-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #E8F3EE;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .feature-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        .feature-item h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .feature-item p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .step-box {
+            background: #F9FAFB;
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 18px;
         }
-        .instructions h4 {
-            font-size: 13px;
-            color: var(--primary-dark);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .step-num {
+            display: inline-flex;
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #FFFFFF;
+            font-weight: 800;
+            font-size: 14px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
         }
-        .instructions ol {
-            padding-left: 20px;
-            font-size: 13px;
-            color: var(--text-sub);
-            line-height: 1.6;
+        .step-box h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
-        .footer-links {
-            margin-top: 24px;
-            font-size: 13px;
+        .step-box p {
+            font-size: 13.5px;
+            color: var(--muted);
         }
-        .footer-links a {
-            color: var(--primary);
+        .bottom-cta {
+            text-align: center;
+        }
+        .btn-download-dark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--primary);
+            color: #FFFFFF;
             text-decoration: none;
-            font-weight: 600;
+            padding: 15px 28px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            box-shadow: 0 10px 22px -6px rgba(45, 106, 79, 0.45);
+            transition: background 0.18s ease, transform 0.18s ease;
         }
-        .footer-links a:hover {
-            text-decoration: underline;
+        .btn-download-dark:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn-download-dark svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        footer {
+            text-align: center;
+            padding: 0 16px 32px;
+            color: var(--muted);
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="app-badge">RanchCount App v1.0.0</div>
-            <h1 class="app-title">Zootecnia</h1>
-            <p class="app-tagline">Gestión de Ganado, Lotes Agrícolas y Finanzas</p>
-        </div>
-        <div class="body-content">
-            <div class="info-grid">
-                <div class="info-box">
-                    <span>Tamaño</span>
-                    <strong>21.2 MB</strong>
-                </div>
-                <div class="info-box">
-                    <span>Plataforma</span>
-                    <strong>Android 8+</strong>
-                </div>
-                <div class="info-box">
-                    <span>Backend</span>
-                    <strong>Render Cloud</strong>
-                </div>
+    <header class="hero">
+        <div class="hero-inner">
+            <div class="logo-wrap">
+                <img src="/images/logo.png" alt="Logo Zootecnia RanchCount">
             </div>
-
-            <a href="/apk/ranchcount.apk" class="btn-download" download="ranchcount.apk">
-                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-                Descargar APK Android
+            <div class="badge">Aplicación Móvil Android</div>
+            <h1>Zootecnia · RanchCount</h1>
+            <p>
+                Sistema integral para administrar tu rancho desde el celular: control del hato bovino,
+                reproducción y partos, lotes de siembra geolocalizados por GPS, finanzas, clima y alertas automáticas.
+            </p>
+            <a href="/apk/ranchcount.apk" class="btn-download" download="Zootecnia-RanchCount.apk">
+                <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm14-9h-4V3H9v8H5l7 7 7-7z"/></svg>
+                Descargar APK Android (21.2 MB)
             </a>
-
-            <div class="instructions">
-                <h4>Pasos para instalar en el celular:</h4>
-                <ol>
-                    <li>Presiona el botón de <strong>Descargar APK</strong>.</li>
-                    <li>Abre el archivo descargado desde tu barra de notificaciones.</li>
-                    <li>Si Android pregunta, selecciona <em>Permitir instalar aplicaciones desconocidas</em> para tu navegador.</li>
-                    <li>Inicia sesión con tu cuenta de Propietario.</li>
-                </ol>
-            </div>
-
-            <div class="footer-links">
-                <p><a href="/swagger-ui.html" target="_blank">Documentación interactiva de la API (Swagger)</a></p>
+            <div class="meta-pills">
+                Versión 1.0.0 &nbsp;·&nbsp; Android 8.0 o superior &nbsp;·&nbsp; Conexión en la nube
             </div>
         </div>
-    </div>
+    </header>
+
+    <main class="main">
+        <section class="section-card">
+            <h2 class="section-title">¿Qué puedes hacer con Zootecnia?</h2>
+            <p class="section-subtitle">
+                Todas las operaciones diarias del rancho centralizadas en tiempo real.
+            </p>
+            <div class="features-grid">
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4zm14.5-1.5 1.4 1.4L16 19.8l-2.9-2.9 1.4-1.4 1.5 1.5z"/></svg>
+                    </div>
+                    <h3>Control del Hato Bovino</h3>
+                    <p>Inventario completo de machos y hembras por arete, raza, peso en kg y estado productivo, con búsqueda instantánea.</p>
+                </article>
+
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                    </div>
+                    <h3>Ciclo Reproductivo y Partos</h3>
+                    <p>Registro de montas con cálculo automático de fecha estimada de parto, seguimiento de próximos partos y alta de crías.</p>
+                </article>
+
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                    </div>
+                    <h3>Lotes Agrícolas con GPS</h3>
+                    <p>Control de parcelas, hectáreas sembradas, inversión por hectárea, días para cosecha y ubicación GPS verificable en mapa.</p>
+                </article>
+
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    <h3>Finanzas y Caja del Rancho</h3>
+                    <p>Registro de ingresos y egresos por categoría, balance neto y resumen financiero del rancho en tiempo real.</p>
+                </article>
+
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+                    </div>
+                    <h3>Clima Local y Pronóstico</h3>
+                    <p>Consulta de condiciones actuales, humedad, viento, pronóstico de 5 días y recomendaciones operativas según tu ubicación.</p>
+                </article>
+
+                <article class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                    </div>
+                    <h3>Alertas por Telegram y Roles</h3>
+                    <p>Avisos automáticos de partos próximos directo a Telegram y control de accesos diferenciado para Propietario y Operador.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-card">
+            <h2 class="section-title">Cómo instalar en Android</h2>
+            <p class="section-subtitle">
+                Instala la aplicación en menos de un minuto directamente en tu teléfono.
+            </p>
+            <div class="steps-grid">
+                <div class="step-box">
+                    <div class="step-num">1</div>
+                    <h4>Descarga el archivo</h4>
+                    <p>Presiona el botón de descarga para obtener el instalador <strong>Zootecnia-RanchCount.apk</strong>.</p>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">2</div>
+                    <h4>Autoriza e instala</h4>
+                    <p>Abre el archivo desde tus descargas y acepta instalar aplicaciones desde tu navegador si Android lo solicita.</p>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">3</div>
+                    <h4>Inicia sesión</h4>
+                    <p>Ingresa con tus credenciales asignadas para consultar y registrar información desde cualquier lugar.</p>
+                </div>
+            </div>
+            <div class="bottom-cta">
+                <a href="/apk/ranchcount.apk" class="btn-download-dark" download="Zootecnia-RanchCount.apk">
+                    <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm14-9h-4V3H9v8H5l7 7 7-7z"/></svg>
+                    Descargar APK Android
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        Zootecnia · RanchCount &copy; 2026 — Gestión Integral Ganadera y Agrícola
+    </footer>
 </body>
 </html>

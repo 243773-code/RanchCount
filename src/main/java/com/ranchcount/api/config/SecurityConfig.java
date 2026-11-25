@@ -3,6 +3,7 @@ package com.ranchcount.api.config;
 import com.ranchcount.api.security.CustomAccessDeniedHandler;
 import com.ranchcount.api.security.JwtAuthenticationEntryPoint;
 import com.ranchcount.api.security.JwtAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,12 +47,17 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints publicos (Login y documentacion interactiva OpenAPI 3.0)
+                        // Permitir despachos internos (ERROR / FORWARD) para evitar 401 en vistas estaticas
+                        .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        // Endpoints publicos (Landing, APK, Login y documentacion interactiva OpenAPI 3.0)
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/index.html",
+                                "/descargar",
                                 "/apk/**",
+                                "/images/**",
+                                "/favicon.ico",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
