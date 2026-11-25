@@ -1,0 +1,67 @@
+server:
+  # Render inyecta PORT; en local se usa SERVER_PORT o 8080
+  port: ${PORT:${SERVER_PORT:8080}}
+
+spring:
+  application:
+    name: ranchcount-api
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ranchcount_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: America/Mexico_City
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+app:
+  datasource:
+    dev-fallback-enabled: ${DB_DEV_FALLBACK_ENABLED:true}
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET:}
+      expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+  integrations:
+    telegram:
+      enabled: ${TELEGRAM_ALERTS_ENABLED:true}
+      api-url: ${TELEGRAM_API_URL:https://api.telegram.org}
+      bot-token: ${TELEGRAM_BOT_TOKEN:}
+      chat-id: ${TELEGRAM_CHAT_ID:}
+    open-meteo:
+      api-url: ${OPENMETEO_API_URL:https://api.open-meteo.com/v1/forecast}
+      default-latitude: ${RANCH_DEFAULT_LAT:20.6597}
+      default-longitude: ${RANCH_DEFAULT_LON:-103.3496}
+
+  scheduler:
+    parto-alert-cron: ${PARTO_ALERT_CRON:0 0 7 * * *}
+    parto-anticipation-days: ${PARTO_ANTICIPATION_DAYS:7}
+
+  bootstrap:
+    owner:
+      enabled: ${INITIAL_OWNER_ENABLED:true}
+      full-name: ${INITIAL_OWNER_NAME:Propietario RanchCount}
+      username: ${INITIAL_OWNER_USERNAME:owner}
+      password: ${INITIAL_OWNER_PASSWORD:}
+      phone: ${INITIAL_OWNER_PHONE:}

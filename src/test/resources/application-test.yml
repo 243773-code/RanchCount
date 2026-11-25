@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ranchcount_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  security:
+    jwt:
+      secret: clave_secreta_exclusiva_para_entorno_de_testing_automatizado_256bits
+      expiration-ms: 3600000
+
+  integrations:
+    telegram:
+      enabled: false
+      api-url: http://localhost:9999
+      bot-token: "test_bot_token"
+      chat-id: "123456789"
+    open-meteo:
+      api-url: http://localhost:9999/v1/forecast
+      default-latitude: 20.6597
+      default-longitude: -103.3496
+
+  scheduler:
+    parto-alert-cron: "0 0 7 * * *"
+    parto-anticipation-days: 7
+
+  bootstrap:
+    owner:
+      enabled: true
+      full-name: "Propietario Test"
+      username: "owner_test"
+      password: "OwnerTestPassword123!"
+      phone: "+5215512345678"

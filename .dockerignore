@@ -1,0 +1,9 @@
+target/
+data/
+.idea/
+.vscode/
+.env
+*.env.local
+*.log
+RanchCount_Insomnia_Collection.json
+test_endpoints.ps1
