@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 @Component
 public class TelegramAlertClient {
 
@@ -60,13 +56,12 @@ public class TelegramAlertClient {
         }
 
         try {
-            String encodedText = URLEncoder.encode(mensajeTexto, StandardCharsets.UTF_8);
-            String encodedChatId = URLEncoder.encode(targetChatId, StandardCharsets.UTF_8);
-
-            URI uri = URI.create("https://api.telegram.org/bot" + botToken.trim() + "/sendMessage?chat_id=" + encodedChatId + "&text=" + encodedText);
-
             String respuesta = telegramWebClient.get()
-                    .uri(uri)
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/bot" + botToken.trim() + "/sendMessage")
+                            .queryParam("chat_id", targetChatId)
+                            .queryParam("text", mensajeTexto)
+                            .build())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
