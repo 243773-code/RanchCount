@@ -1,0 +1,197 @@
+name: CI/CD Pipeline - RanchCount API
+
+# ==============================================================================
+# Disparadores del Pipeline (Events)
+# - Se ejecuta automaticamente en cada push a main o a la rama de CI/CD.
+# - Valida Pull Requests dirigidos a main antes de autorizar el merge.
+# - Permite disparo manual desde GitHub UI o via CLI (`gh workflow run`).
+# ==============================================================================
+on:
+  push:
+    branches:
+      - main
+      - ci/github-actions-pipeline
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Principio de minimo privilegio: permiso global de solo lectura
+permissions:
+  contents: read
+
+# Evita ejecuciones redundantes simultaneas sobre la misma rama
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Variables de entorno no sensibles compartidas en el flujo
+env:
+  JAVA_VERSION: '17'
+  REGISTRY: ghcr.io
+  RENDER_SERVICE_URL: https://ranchcount-api.onrender.com
+
+jobs:
+  # ============================================================================
+  # JOB 1: INTEGRACION CONTINUA (CI)
+  # Descarga codigo, configura JDK 17 + cache Maven, ejecuta analisis estatico,
+  # corre pruebas unitarias/integracion, empaqueta el JAR y valida Dockerfile.
+  # ============================================================================
+  ci:
+    name: CI - Build, Static Analysis, Tests & Docker Validation
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        java-version: ['17']
+
+    steps:
+      - name: Descargar codigo fuente del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK ${{ matrix.java-version }} y cache de Maven
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+
+      - name: Asignar permisos de ejecucion al Maven Wrapper
+        run: chmod +x mvnw
+
+      - name: Analisis estatico de POM y compilacion con advertencias
+        run: ./mvnw -B validate test-compile -Dmaven.compiler.showWarnings=true
+
+      - name: Analisis estatico del Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
+
+      - name: Auditoria de higiene de credenciales en el repositorio
+        run: |
+          echo "Verificando ausencia de archivos .env rastreados por Git..."
+          if git ls-files | grep -Eq '(^|/)\.env(\.|$)'; then
+            echo "ERROR: Se detecto un archivo .env rastreado en el repositorio."
+            exit 1
+          fi
+          echo "Verificando ausencia de tokens o claves privadas hardcodeadas en workflows..."
+          if grep -rnE '(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' .github/workflows/; then
+            echo "ERROR: Posible credencial expuesta detectada en .github/workflows/."
+            exit 1
+          fi
+          echo "Auditoria de seguridad aprobada: sin credenciales expuestas."
+
+      - name: Ejecutar pruebas unitarias y de integracion (H2 + MockWebServer)
+        run: ./mvnw -B test
+
+      - name: Publicar reportes de pruebas Surefire
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: target/surefire-reports/
+          retention-days: 7
+
+      - name: Empaquetar artefacto JAR ejecutable
+        run: ./mvnw -B package -DskipTests
+
+      - name: Subir artefacto JAR compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranchcount-api-jar
+          path: target/*.jar
+          retention-days: 7
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validar construccion de imagen Docker multi-stage (sin push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ranchcount-api:ci-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # JOB 2: DESPLIEGUE CONTINUO (CD)
+  # Depende del exito de CI. Solo corre en push a main o disparo manual.
+  # Publica imagen en GHCR, dispara despliegue en Render via Secret y realiza
+  # un smoke test HTTP contra el servicio web y la landing en produccion.
+  # ============================================================================
+  cd:
+    name: CD - Publish GHCR Image & Deploy to Render
+    needs: ci
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Descargar codigo fuente del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Iniciar sesion en GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generar metadatos y etiquetas normalizadas de imagen Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+
+      - name: Construir y publicar imagen Docker en GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Disparar despliegue automatizado en Render (Deploy Hook via Secret)
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Disparando Render Deploy Hook de forma segura mediante Secret..."
+            curl --fail --silent --show-error -X POST "$RENDER_DEPLOY_HOOK_URL"
+            echo "Despliegue en Render activado correctamente."
+          else
+            echo "Secret RENDER_DEPLOY_HOOK_URL no definido; Render Blueprint (render.yaml autoDeploy: true) sincroniza los cambios en main."
+          fi
+
+      - name: Verificacion post-despliegue (Smoke Test en vivo sobre Render)
+        run: |
+          echo "Verificando disponibilidad del servicio en $RENDER_SERVICE_URL ..."
+          for i in $(seq 1 15); do
+            LANDING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$RENDER_SERVICE_URL/")
+            DOCS_BODY=$(curl -s --max-time 30 "$RENDER_SERVICE_URL/v3/api-docs" || true)
+            DOCS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$RENDER_SERVICE_URL/v3/api-docs")
+            APK_STATUS=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 30 "$RENDER_SERVICE_URL/apk/ranchcount.apk")
+
+            echo "Intento $i/15 -> Landing: HTTP $LANDING_STATUS | OpenAPI: HTTP $DOCS_STATUS | APK: HTTP $APK_STATUS"
+            if [ "$LANDING_STATUS" = "200" ] && [ "$DOCS_STATUS" = "200" ] && [ "$APK_STATUS" = "200" ] && echo "$DOCS_BODY" | grep -q '"openapi"'; then
+              echo "Verificacion exitosa: Landing page, API RESTful (OpenAPI) y APK activos en Render."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "ERROR: El servicio no respondio con HTTP 200 en todos los endpoints esperados."
+          exit 1
